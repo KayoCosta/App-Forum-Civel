@@ -64,6 +64,9 @@ function exibirAtual() {
   } else if (['mp4', 'webm'].includes(ext)) {
     video.src = `/midia/${file}`;
     video.style.display = "block";
+    video.controls = false;
+    video.muted = true;
+    video.play().catch(e => console.warn("Autoplay falhou:", e));
     video.onended = () => proximaMidia();
   } else {
     proximaMidia();
