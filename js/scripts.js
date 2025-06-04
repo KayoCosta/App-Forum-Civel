@@ -9,37 +9,44 @@ const video = document.getElementById("video-display");
 const pageNumEl = document.getElementById("page-num");
 const pageCountEl = document.getElementById("page-count");
 const timeEl = document.getElementById("time");
-
-const qrCanvas = document.getElementById("qrcode");
-const qr = new QRious({
-  element: qrCanvas,
-  size: 150,
-  value: ""
-});
+const dateEl = document.getElementById("date");
+const dayEl = document.getElementById("day");
 
 let midiaList = [];
 let currentIndex = 0;
 let currentPage = 1;
 let pdfDoc = null;
 
-// Relógio
-setInterval(() => {
+// Atualizar relógio e data
+function atualizarTempo() {
   const now = new Date();
   timeEl.textContent = now.toLocaleTimeString("pt-BR");
-}, 1000);
+  dateEl.textContent = now.toLocaleDateString("pt-BR", {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+  dayEl.textContent = now.toLocaleDateString("pt-BR", { weekday: 'long' });
+}
+
+setInterval(atualizarTempo, 1000);
 
 // Obter arquivos
 async function carregarMidia() {
-  const res = await fetch('/api/midia');
-  const data = await res.json();
+  try {
+    const res = await fetch('/api/midia');
+    const data = await res.json();
 
-  if (data.length === 0) {
-    alert("Nenhum arquivo encontrado na pasta.");
-    return;
+    if (data.length === 0) {
+      alert("Nenhum arquivo encontrado na pasta.");
+      return;
+    }
+
+    midiaList = data.map(decodeURIComponent);
+    iniciarExibicao();
+  } catch (err) {
+    console.error("Erro ao carregar mídia:", err);
   }
-
-  midiaList = data;
-  iniciarExibicao();
 }
 
 function iniciarExibicao() {
@@ -51,18 +58,16 @@ function exibirAtual() {
 
   const file = midiaList[currentIndex];
   const ext = file.split('.').pop().toLowerCase();
-  const fullURL = `http://localhost:3000/midia/${file}`;
-
-  qr.value = fullURL;
+  const fullURL = `${location.origin}/midia/${encodeURIComponent(file)}`;
 
   if (ext === 'pdf') {
-    carregarPDF(`/midia/${file}`);
+    carregarPDF(fullURL);
   } else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-    image.src = `/midia/${file}`;
+    image.src = fullURL;
     image.style.display = "block";
-    avancarDepois(15000);
+    avancarDepois(10000);
   } else if (['mp4', 'webm'].includes(ext)) {
-    video.src = `/midia/${file}`;
+    video.src = fullURL;
     video.style.display = "block";
     video.controls = false;
     video.muted = true;
@@ -83,45 +88,56 @@ function esconderTodos() {
 }
 
 async function carregarPDF(url) {
-  const loadingTask = pdfjsLib.getDocument(url);
-  pdfDoc = await loadingTask.promise;
+  try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-  currentPage = 1;
-  renderizarPaginas();
+    const loadingTask = pdfjsLib.getDocument(url);
+    pdfDoc = await loadingTask.promise;
+
+    currentPage = 1;
+    renderizarPaginas();
+  } catch (err) {
+    console.error("Erro ao carregar PDF:", err);
+    proximaMidia();
+  }
 }
 
 async function renderizarPaginas() {
-  const totalPages = pdfDoc.numPages;
-  pageCountEl.textContent = totalPages;
-  pageNumEl.textContent = currentPage;
+  try {
+    const totalPages = pdfDoc.numPages;
+    if (pageCountEl) pageCountEl.textContent = totalPages;
+    if (pageNumEl) pageNumEl.textContent = currentPage;
 
-  const page1 = await pdfDoc.getPage(currentPage);
-  const viewport1 = page1.getViewport({ scale: 1.4 });
-  canvas1.height = viewport1.height;
-  canvas1.width = viewport1.width;
-  await page1.render({ canvasContext: ctx1, viewport: viewport1 }).promise;
-  canvas1.style.display = "block";
+    const page1 = await pdfDoc.getPage(currentPage);
+    const viewport1 = page1.getViewport({ scale: 1.2 });
+    canvas1.height = viewport1.height;
+    canvas1.width = viewport1.width;
+    await page1.render({ canvasContext: ctx1, viewport: viewport1 }).promise;
+    canvas1.style.display = "block";
 
-  if (currentPage + 1 <= totalPages) {
-    const page2 = await pdfDoc.getPage(currentPage + 1);
-    const viewport2 = page2.getViewport({ scale: 1.4 });
-    canvas2.height = viewport2.height;
-    canvas2.width = viewport2.width;
-    await page2.render({ canvasContext: ctx2, viewport: viewport2 }).promise;
-    canvas2.style.display = "block";
-  } else {
-    canvas2.style.display = "none";
-  }
-
-  setTimeout(() => {
-    currentPage += 2;
-
-    if (currentPage > totalPages) {
-      proximaMidia();
+    if (currentPage + 1 <= totalPages) {
+      const page2 = await pdfDoc.getPage(currentPage + 1);
+      const viewport2 = page2.getViewport({ scale: 1.2 });
+      canvas2.height = viewport2.height;
+      canvas2.width = viewport2.width;
+      await page2.render({ canvasContext: ctx2, viewport: viewport2 }).promise;
+      canvas2.style.display = "block";
     } else {
-      renderizarPaginas();
+      canvas2.style.display = "none";
     }
-  }, 15000);
+
+    setTimeout(() => {
+      currentPage += 2;
+      if (currentPage > totalPages) {
+        proximaMidia();
+      } else {
+        renderizarPaginas();
+      }
+    }, 15000);
+  } catch (err) {
+    console.error("Erro ao renderizar páginas do PDF:", err);
+    proximaMidia();
+  }
 }
 
 function avancarDepois(ms) {
@@ -134,3 +150,4 @@ function proximaMidia() {
 }
 
 carregarMidia();
+atualizarTempo();
