@@ -25,65 +25,42 @@ body {
   height: auto;
 }
 
-.time {
-  margin-top: 40px;
-  margin-bottom: 40px;
-  font-size: 40px;
-  color: #000;
-  font-weight: bold;
-}
-
-.qr-code canvas {
-  display: block;
-  margin: 0 auto;
-}
-
-#edital-text {
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.4rem;
-  color: #000;
-  margin-bottom: 10px;
-}
-
-.qr-code-string {
-  font-size: 1.4rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-.github {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.github a {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-  font-weight: bold;
-}
-
-.github p {
-  margin: 0;
-  margin-left: 10px;
-  font-size: 1rem;
-  color: #000;
-}
-
-.github img {
-  width: 25px;
-  height: 25px;
-}
-
 .tribunal {
   font-size: 1.4rem;
   text-align: center;
   font-weight: bold;
   margin-top: 20px;
+}
+
+.time {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  text-align: center;
+  width: 100%;
+}
+
+#time {
+  font-size: 40px;
+  color: #000;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1;
+}
+
+#date {
+  font-size: 24px;
+  color: #000;
+  font-weight: bold;
+  margin-top: 10px;
+  line-height: 1;
+}
+
+#day {
+  font-size: 20px;
+  color: #333;
+  font-weight: 600;
+  margin-top: 5px;
+  text-transform: capitalize;
 }
 
 .main-content {
