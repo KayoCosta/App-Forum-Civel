@@ -5,11 +5,13 @@ const app = express();
 
 const PORT = 3000;
 
+const midiaDir = path.join('Z:\\', 'Meu Drive', 'Pasta de teste');
+
 app.use(express.static(path.join(__dirname)));
 
-app.get('/api/midia', (req, res) => {
-  const midiaDir = path.join(__dirname, 'midia');
+app.use('/midia', express.static(midiaDir));
 
+app.get('/api/midia', (req, res) => {
   fs.readdir(midiaDir, (err, files) => {
     if (err) {
       return res.status(500).json({ error: 'Erro ao ler a pasta de mídias' });
