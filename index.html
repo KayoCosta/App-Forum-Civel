@@ -3,13 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>app edital</title>
+  <title>Fórum Cível - Vitória/ES</title>
 
-  <!-- PDF.js e QRious -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  
 
-  <!-- Estilos e scripts -->
   <link rel="icon" href="img/brasaoEspiritoSanto.png" type="image/x-icon">
   <link rel="stylesheet" href="css/styles.css">
   <script src="js/scripts.js" defer></script>
@@ -24,14 +22,10 @@
     </div>
     <div class="time">
       <p id="time">00:00:00</p>
+      <p id="date">--/--/----</p>
+      <p id="day">------</p>
     </div>
-    <div class="qr-code">
-      <p id="edital-text">Consulte o edital.</p>
-      <canvas id="qrcode" width="150" height="150"></canvas>
-    </div>
-    <div class="qr-code-string">
-      <p><span id="page-num">1</span> de <span id="page-count">1</span></p>
-    </div>    
+    <canvas id="qrcode" style="margin: 0 auto;"></canvas>
   </div>
 
   <div class="main-content">
